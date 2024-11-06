@@ -16,6 +16,8 @@ project(VBANPlugin
 
 set(SMTG_VSTGUI_ROOT "${vst3sdk_SOURCE_DIR}")
 
+option(SMTG_ENABLE_VST3_PLUGIN_EXAMPLES "" OFF)
+option(SMTG_ENABLE_VSTGUI_SUPPORT "" OFF)
 add_subdirectory(${vst3sdk_SOURCE_DIR} ${PROJECT_BINARY_DIR}/vst3sdk)
 smtg_enable_vst3_sdk()
 
