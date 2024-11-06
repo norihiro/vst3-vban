@@ -83,3 +83,5 @@ elseif(SMTG_WIN)
         )
     endif()
 endif(SMTG_MAC)
+
+file(GENERATE OUTPUT .gitignore CONTENT "*\n")
