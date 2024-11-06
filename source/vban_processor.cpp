@@ -14,61 +14,61 @@ namespace NagaterNet {
 //------------------------------------------------------------------------
 // CVBANPluginProcessor
 //------------------------------------------------------------------------
-CVBANPluginProcessor::CVBANPluginProcessor ()
+CVBANPluginProcessor::CVBANPluginProcessor()
 {
 	//--- set the wanted controller for our processor
-	setControllerClass (kCVBANPluginControllerUID);
+	setControllerClass(kCVBANPluginControllerUID);
 }
 
 //------------------------------------------------------------------------
-CVBANPluginProcessor::~CVBANPluginProcessor ()
-{}
+CVBANPluginProcessor::~CVBANPluginProcessor()
+{
+}
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API CVBANPluginProcessor::initialize (FUnknown* context)
+tresult PLUGIN_API CVBANPluginProcessor::initialize(FUnknown *context)
 {
 	// Here the Plug-in will be instantiated
-	
+
 	//---always initialize the parent-------
-	tresult result = AudioEffect::initialize (context);
+	tresult result = AudioEffect::initialize(context);
 	// if everything Ok, continue
-	if (result != kResultOk)
-	{
+	if (result != kResultOk) {
 		return result;
 	}
 
 	//--- create Audio IO ------
-	addAudioInput (STR16 ("Stereo In"), Steinberg::Vst::SpeakerArr::kStereo);
-	addAudioOutput (STR16 ("Stereo Out"), Steinberg::Vst::SpeakerArr::kStereo);
+	addAudioInput(STR16("Stereo In"), Steinberg::Vst::SpeakerArr::kStereo);
+	addAudioOutput(STR16("Stereo Out"), Steinberg::Vst::SpeakerArr::kStereo);
 
 	/* If you don't need an event bus, you can remove the next line */
-	addEventInput (STR16 ("Event In"), 1);
+	addEventInput(STR16("Event In"), 1);
 
 	return kResultOk;
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API CVBANPluginProcessor::terminate ()
+tresult PLUGIN_API CVBANPluginProcessor::terminate()
 {
 	// Here the Plug-in will be de-instantiated, last possibility to remove some memory!
-	
+
 	//---do not forget to call parent ------
-	return AudioEffect::terminate ();
+	return AudioEffect::terminate();
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API CVBANPluginProcessor::setActive (TBool state)
+tresult PLUGIN_API CVBANPluginProcessor::setActive(TBool state)
 {
 	//--- called when the Plug-in is enable/disable (On/Off) -----
-	return AudioEffect::setActive (state);
+	return AudioEffect::setActive(state);
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API CVBANPluginProcessor::process (Vst::ProcessData& data)
+tresult PLUGIN_API CVBANPluginProcessor::process(Vst::ProcessData &data)
 {
 	//--- First : Read inputs parameter changes-----------
 
-    /*if (data.inputParameterChanges)
+	/*if (data.inputParameterChanges)
     {
         int32 numParamsChanged = data.inputParameterChanges->getParameterCount ();
         for (int32 index = 0; index < numParamsChanged; index++)
@@ -84,21 +84,21 @@ tresult PLUGIN_API CVBANPluginProcessor::process (Vst::ProcessData& data)
 			}
 		}
 	}*/
-	
+
 	//--- Here you have to implement your processing
 
 	return kResultOk;
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API CVBANPluginProcessor::setupProcessing (Vst::ProcessSetup& newSetup)
+tresult PLUGIN_API CVBANPluginProcessor::setupProcessing(Vst::ProcessSetup &newSetup)
 {
 	//--- called before any processing ----
-	return AudioEffect::setupProcessing (newSetup);
+	return AudioEffect::setupProcessing(newSetup);
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API CVBANPluginProcessor::canProcessSampleSize (int32 symbolicSampleSize)
+tresult PLUGIN_API CVBANPluginProcessor::canProcessSampleSize(int32 symbolicSampleSize)
 {
 	// by default kSample32 is supported
 	if (symbolicSampleSize == Vst::kSample32)
@@ -112,19 +112,19 @@ tresult PLUGIN_API CVBANPluginProcessor::canProcessSampleSize (int32 symbolicSam
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API CVBANPluginProcessor::setState (IBStream* state)
+tresult PLUGIN_API CVBANPluginProcessor::setState(IBStream *state)
 {
 	// called when we load a preset, the model has to be reloaded
-	IBStreamer streamer (state, kLittleEndian);
-	
+	IBStreamer streamer(state, kLittleEndian);
+
 	return kResultOk;
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API CVBANPluginProcessor::getState (IBStream* state)
+tresult PLUGIN_API CVBANPluginProcessor::getState(IBStream *state)
 {
 	// here we need to save the model
-	IBStreamer streamer (state, kLittleEndian);
+	IBStreamer streamer(state, kLittleEndian);
 
 	return kResultOk;
 }
