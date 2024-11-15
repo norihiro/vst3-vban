@@ -4,6 +4,7 @@
 
 #include "vban_controller.h"
 #include "vban_cids.h"
+#include "paramids.h"
 
 using namespace Steinberg;
 
