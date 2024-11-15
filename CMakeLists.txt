@@ -16,6 +16,8 @@ project(VBANPlugin
 
 set(SMTG_VSTGUI_ROOT "${vst3sdk_SOURCE_DIR}")
 
+set(SMTG_CXX_STANDARD "17")
+
 option(SMTG_ENABLE_VST3_PLUGIN_EXAMPLES "" OFF)
 option(SMTG_ENABLE_VSTGUI_SUPPORT "" OFF)
 add_subdirectory(${vst3sdk_SOURCE_DIR} ${PROJECT_BINARY_DIR}/vst3sdk)
@@ -29,6 +31,7 @@ smtg_add_vst3plugin(VBANPlugin
     source/vban_controller.h
     source/vban_controller.cpp
     source/vban_entry.cpp
+    source/audio_buffer.cc
 )
 
 #- VSTGUI Wanted ----

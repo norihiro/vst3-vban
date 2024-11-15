@@ -118,7 +118,7 @@ tresult PLUGIN_API CVBANPluginProcessor::process(Vst::ProcessData &data)
 		}
 	}
 
-	/* TODO: Send the audio data through VBAN. */
+	packets.add_float(out, numChannels, data.numSamples);
 
 	return kResultOk;
 }

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "audio_buffer.h"
 #include "public.sdk/source/vst/vstaudioeffect.h"
 
 namespace NagaterNet {
@@ -48,6 +49,7 @@ public:
 protected:
 	uint32_t dest_addr;
 	uint16_t dest_port;
+	struct audio_buffer packets;
 };
 
 } // namespace NagaterNet
