@@ -6,6 +6,8 @@
 #include "vban_cids.h"
 #include "paramids.h"
 
+#include "base/source/fstreamer.h"
+
 using namespace Steinberg;
 
 namespace NagaterNet {
@@ -25,6 +27,25 @@ tresult PLUGIN_API CVBANPluginController::initialize(FUnknown *context)
 
 	// Here you could register some parameters
 
+	using Steinberg::Vst::Parameter;
+	using Steinberg::Vst::RangeParameter;
+
+	Parameter *param;
+	param = new RangeParameter(STR16("IPv4 Address 1"), paramid_ipv4_0, nullptr, 0.0, 255.0, 0.0, 255);
+	parameters.addParameter(param);
+
+	param = new RangeParameter(STR16("IPv4 Address 2"), paramid_ipv4_1, nullptr, 0.0, 255.0, 0.0, 255);
+	parameters.addParameter(param);
+
+	param = new RangeParameter(STR16("IPv4 Address 3"), paramid_ipv4_2, nullptr, 0.0, 255.0, 0.0, 255);
+	parameters.addParameter(param);
+
+	param = new RangeParameter(STR16("IPv4 Address 4"), paramid_ipv4_3, nullptr, 0.0, 255.0, 0.0, 255);
+	parameters.addParameter(param);
+
+	param = new RangeParameter(STR16("Port"), paramid_port, nullptr, 0.0, 65535.0, 6980.0, 65535);
+	parameters.addParameter(param);
+
 	return result;
 }
 
@@ -40,9 +61,31 @@ tresult PLUGIN_API CVBANPluginController::terminate()
 //------------------------------------------------------------------------
 tresult PLUGIN_API CVBANPluginController::setComponentState(IBStream *state)
 {
-	// Here you get the state of the component (Processor part)
+	/* Called to load the configuration of the processor from `state` */
 	if (!state)
 		return kResultFalse;
+
+	IBStreamer streamer(state, kLittleEndian);
+
+	uint32_t dest_addr = 0;
+	uint16_t dest_port = 0;
+
+	uint32_t version = 0;
+	streamer.readInt32u(version);
+	uint32_t version_major = version >> 24;
+	uint32_t version_minor = (version >> 16) & 0xFF;
+	uint32_t version_patch = version & 0xFFFF;
+	if (version_major > 0x01)
+		return kResultFalse;
+
+	streamer.readInt32u(dest_addr);
+	streamer.readInt16u(dest_port);
+
+	setParamNormalized(paramid_ipv4_0, ((dest_addr >> 24) & 0xFF) / 255.0);
+	setParamNormalized(paramid_ipv4_1, ((dest_addr >> 16) & 0xFF) / 255.0);
+	setParamNormalized(paramid_ipv4_2, ((dest_addr >> 8) & 0xFF) / 255.0);
+	setParamNormalized(paramid_ipv4_3, ((dest_addr >> 0) & 0xFF) / 255.0);
+	setParamNormalized(paramid_port, dest_port / 65535.0);
 
 	return kResultOk;
 }

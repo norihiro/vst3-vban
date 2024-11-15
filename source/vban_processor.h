@@ -8,9 +8,6 @@
 
 namespace NagaterNet {
 
-//------------------------------------------------------------------------
-//  CVBANPluginProcessor
-//------------------------------------------------------------------------
 class CVBANPluginProcessor : public Steinberg::Vst::AudioEffect
 {
 public:
@@ -48,9 +45,9 @@ public:
 	Steinberg::tresult PLUGIN_API setState(Steinberg::IBStream *state) SMTG_OVERRIDE;
 	Steinberg::tresult PLUGIN_API getState(Steinberg::IBStream *state) SMTG_OVERRIDE;
 
-	//------------------------------------------------------------------------
 protected:
+	uint32_t dest_addr;
+	uint16_t dest_port;
 };
 
-//------------------------------------------------------------------------
 } // namespace NagaterNet

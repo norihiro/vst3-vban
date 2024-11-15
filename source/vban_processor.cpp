@@ -4,6 +4,7 @@
 
 #include "vban_processor.h"
 #include "vban_cids.h"
+#include "paramids.h"
 
 #include "base/source/fstreamer.h"
 #include "pluginterfaces/vst/ivstparameterchanges.h"
@@ -55,6 +56,11 @@ tresult PLUGIN_API CVBANPluginProcessor::setActive(TBool state)
 	return AudioEffect::setActive(state);
 }
 
+static uint32_t param_to_u32(double value, uint32_t max)
+{
+	return std::clamp((uint32_t)(value * max + 0.5), 0u, max);
+}
+
 tresult PLUGIN_API CVBANPluginProcessor::process(Vst::ProcessData &data)
 {
 	if (auto *paramChanges = data.inputParameterChanges) {
@@ -65,9 +71,26 @@ tresult PLUGIN_API CVBANPluginProcessor::process(Vst::ProcessData &data)
 				continue;
 
 			auto numPoints = paramQueue->getPointCount();
+			int offset;
+			double value = 0.0;
+			paramQueue->getPoint(0, offset, value);
 
 			switch (paramQueue->getParameterId()) {
-				/* TODO: Process parameter changes */
+			case paramid_ipv4_0:
+				dest_addr = (param_to_u32(value, 255) << 24) | (dest_addr & 0x00FFFFFF);
+				break;
+			case paramid_ipv4_1:
+				dest_addr = (param_to_u32(value, 255) << 16) | (dest_addr & 0xFF00FFFF);
+				break;
+			case paramid_ipv4_2:
+				dest_addr = (param_to_u32(value, 255) << 8) | (dest_addr & 0xFFFF00FF);
+				break;
+			case paramid_ipv4_3:
+				dest_addr = param_to_u32(value, 255) | (dest_addr & 0xFFFFFF00);
+				break;
+			case paramid_port:
+				dest_port = param_to_u32(value, 65535);
+				break;
 			}
 		}
 	}
@@ -121,16 +144,33 @@ tresult PLUGIN_API CVBANPluginProcessor::canProcessSampleSize(int32 symbolicSamp
 
 tresult PLUGIN_API CVBANPluginProcessor::setState(IBStream *state)
 {
-	// called when we load a preset, the model has to be reloaded
+	/* Called to load the configuration from `state` */
 	IBStreamer streamer(state, kLittleEndian);
+
+	uint32_t version = 0;
+	streamer.readInt32u(version);
+	uint32_t version_major = version >> 24;
+	uint32_t version_minor = (version >> 16) & 0xFF;
+	uint32_t version_patch = version & 0xFFFF;
+	if (version_major > 0x01)
+		return kResultFalse;
+
+	streamer.readInt32u(dest_addr);
+	streamer.readInt16u(dest_port);
 
 	return kResultOk;
 }
 
 tresult PLUGIN_API CVBANPluginProcessor::getState(IBStream *state)
 {
-	// here we need to save the model
+	/* Called to save the configuration into `state` */
 	IBStreamer streamer(state, kLittleEndian);
+
+	uint32_t version = 0x01'00'0000;
+	streamer.writeInt32u(version);
+
+	streamer.writeInt32u(dest_addr);
+	streamer.writeInt16u(dest_port);
 
 	return kResultOk;
 }
