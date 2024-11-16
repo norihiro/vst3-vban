@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <pthread.h>
 #include "audio_buffer.h"
 #include "public.sdk/source/vst/vstaudioeffect.h"
 
@@ -49,7 +50,23 @@ public:
 protected:
 	uint32_t dest_addr;
 	uint16_t dest_port;
+	std::mutex props_mutex;
+
 	struct audio_buffer packets;
+	pthread_t thread;
+	volatile bool cont = false;
+	bool has_error;
+
+private:
+	void thread_start();
+	void thread_stop();
+	void thread_loop();
+	static void *thread_entry(void *data);
+
+private:
+	bool thread_loop_init(struct loop_context &);
+	bool thread_loop_obtain_from_queue(struct loop_context &);
+	uint32_t thread_loop_send(struct loop_context &);
 };
 
 } // namespace NagaterNet

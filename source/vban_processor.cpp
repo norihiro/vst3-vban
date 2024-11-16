@@ -22,6 +22,8 @@ CVBANPluginProcessor::CVBANPluginProcessor()
 
 CVBANPluginProcessor::~CVBANPluginProcessor()
 {
+	if (cont)
+		thread_stop();
 }
 
 tresult PLUGIN_API CVBANPluginProcessor::initialize(FUnknown *context)
@@ -75,6 +77,8 @@ tresult PLUGIN_API CVBANPluginProcessor::process(Vst::ProcessData &data)
 			double value = 0.0;
 			paramQueue->getPoint(0, offset, value);
 
+			std::unique_lock lk(props_mutex);
+
 			switch (paramQueue->getParameterId()) {
 			case paramid_ipv4_0:
 				dest_addr = (param_to_u32(value, 255) << 24) | (dest_addr & 0x00FFFFFF);
@@ -126,6 +130,12 @@ tresult PLUGIN_API CVBANPluginProcessor::process(Vst::ProcessData &data)
 tresult PLUGIN_API CVBANPluginProcessor::setupProcessing(Vst::ProcessSetup &newSetup)
 {
 	//--- called before any processing ----
+
+	if (cont)
+		thread_stop();
+
+	thread_start();
+
 	return AudioEffect::setupProcessing(newSetup);
 }
 
@@ -155,6 +165,7 @@ tresult PLUGIN_API CVBANPluginProcessor::setState(IBStream *state)
 	if (version_major > 0x01)
 		return kResultFalse;
 
+	std::unique_lock lk(props_mutex);
 	streamer.readInt32u(dest_addr);
 	streamer.readInt16u(dest_port);
 
@@ -169,6 +180,7 @@ tresult PLUGIN_API CVBANPluginProcessor::getState(IBStream *state)
 	uint32_t version = 0x01'00'0000;
 	streamer.writeInt32u(version);
 
+	std::unique_lock lk(props_mutex);
 	streamer.writeInt32u(dest_addr);
 	streamer.writeInt16u(dest_port);
 

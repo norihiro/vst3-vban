@@ -28,10 +28,15 @@ smtg_add_vst3plugin(VBANPlugin
     source/vban_cids.h
     source/vban_processor.h
     source/vban_processor.cpp
+    source/vban_processor_thread.cc
     source/vban_controller.h
     source/vban_controller.cpp
     source/vban_entry.cpp
     source/audio_buffer.cc
+)
+
+target_include_directories(VBANPlugin
+    PRIVATE deps/vban
 )
 
 #- VSTGUI Wanted ----
