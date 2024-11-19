@@ -1,0 +1,30 @@
+name: Clang Format Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  clang:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Clang
+      run: |
+        sudo apt-get install -y clang-format-17
+        clang-format -i -fallback-style=none $(git ls-files source/ | grep '\.\(c\|h\)[chp]*$')
+
+    - name: Check
+      run: |
+        dirty=$(git ls-files --modified)
+        set +x
+        if [[ $dirty ]]; then
+          git diff
+          echo "Error: File(s) are not properly formatted."
+          echo "$dirty"
+          exit 1
+        fi
